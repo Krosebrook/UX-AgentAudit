@@ -1,0 +1,5 @@
+{
+  "name": "UX Audit Agent Workflow",
+  "description": "An AI-powered workflow tool that automates the analysis of UX audit reports, generating improvements, user stories, documentation, and QA checks in a sequential pipeline.",
+  "requestFramePermissions": []
+}
