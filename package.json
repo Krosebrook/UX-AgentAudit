@@ -13,7 +13,10 @@
     "react-dom": "^19.2.4",
     "lucide-react": "^0.564.0",
     "react": "^19.2.4",
-    "@google/genai": "^1.41.0"
+    "@google/genai": "^1.41.0",
+    "pdfjs-dist": "4.10.38",
+    "@uiw/react-codemirror": "4.23.6",
+    "@codemirror/lang-markdown": "6.3.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

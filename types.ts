@@ -4,6 +4,10 @@ export interface WorkflowStep {
   id: number;
   title: string;
   description: string;
+  purpose: string;
+  expectedOutput: string;
+  exampleSystemRole: string;
+  exampleUserPrompt: string;
   status: StepStatus;
   content: string;
 }
@@ -17,10 +21,15 @@ export interface WorkflowData {
   step5Result: string;
 }
 
+export interface PromptTemplate {
+  systemRole: string;
+  userPrompt: string;
+}
+
 export interface PromptTemplates {
-  step1: string;
-  step2: string;
-  step3: string;
-  step4: string;
-  step5: string;
+  step1: PromptTemplate;
+  step2: PromptTemplate;
+  step3: PromptTemplate;
+  step4: PromptTemplate;
+  step5: PromptTemplate;
 }

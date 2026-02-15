@@ -5,10 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UX Audit Agent Workflow</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+      }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
       body {
         font-family: 'Inter', sans-serif;
+      }
+      /* Custom CodeMirror overrides to match UI */
+      .cm-editor {
+        outline: none !important;
+      }
+      .cm-scroller {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.875rem; /* text-sm */
+        line-height: 1.5;
+        padding: 0.75rem;
+      }
+      .cm-focused {
+        outline: none !important;
+      }
+      /* Ensure wrapping */
+      .cm-line {
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
       }
     </style>
   <script type="importmap">
@@ -19,12 +42,15 @@
     "lucide-react": "https://esm.sh/lucide-react@^0.564.0",
     "react/": "https://esm.sh/react@^19.2.4/",
     "react": "https://esm.sh/react@^19.2.4",
-    "@google/genai": "https://esm.sh/@google/genai@^1.41.0"
+    "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
+    "pdfjs-dist": "https://esm.sh/pdfjs-dist@4.10.38",
+    "@uiw/react-codemirror": "https://esm.sh/@uiw/react-codemirror@4.23.6?deps=react@19.2.4,react-dom@19.2.4",
+    "@codemirror/lang-markdown": "https://esm.sh/@codemirror/lang-markdown@6.3.1"
   }
 }
 </script>
 </head>
-  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-700">
+  <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-indigo-100 dark:selection:bg-indigo-900/50 selection:text-indigo-700 dark:selection:text-indigo-300">
     <div id="root"></div>
   </body>
 </html>

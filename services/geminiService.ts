@@ -12,24 +12,45 @@ export const runGeminiStep = async (stepId: number, data: WorkflowData, template
     throw new Error("API Key is missing. Please set process.env.API_KEY.");
   }
 
-  let prompt = '';
+  let userContent = '';
+  let systemInstruction = '';
+  
+  // Helper to get template safely
+  const getTemplate = (key: keyof PromptTemplates) => {
+    return templates[key];
+  };
 
   switch (stepId) {
-    case 1:
-      prompt = `${templates.step1}\n\nAUDIT REPORT:\n${data.auditReport}`;
+    case 1: {
+      const t = getTemplate('step1');
+      systemInstruction = t.systemRole;
+      userContent = `${t.userPrompt}\n\nAUDIT REPORT:\n${data.auditReport}`;
       break;
-    case 2:
-      prompt = `${templates.step2}\n\nPREVIOUS ANALYSIS:\n${data.step1Result}`;
+    }
+    case 2: {
+      const t = getTemplate('step2');
+      systemInstruction = t.systemRole;
+      userContent = `${t.userPrompt}\n\nPREVIOUS ANALYSIS:\n${data.step1Result}`;
       break;
-    case 3:
-      prompt = `${templates.step3}\n\nIMPROVEMENTS PROPOSAL:\n${data.step2Result}`;
+    }
+    case 3: {
+      const t = getTemplate('step3');
+      systemInstruction = t.systemRole;
+      userContent = `${t.userPrompt}\n\nIMPROVEMENTS PROPOSAL:\n${data.step2Result}`;
       break;
-    case 4:
-      prompt = `${templates.step4}\n\nUSER STORIES:\n${data.step3Result}`;
+    }
+    case 4: {
+      const t = getTemplate('step4');
+      systemInstruction = t.systemRole;
+      userContent = `${t.userPrompt}\n\nUSER STORIES:\n${data.step3Result}`;
       break;
-    case 5:
-      prompt = `${templates.step5}\n\nDOCUMENTATION TO CHECK:\n${data.step4Result}`;
+    }
+    case 5: {
+      const t = getTemplate('step5');
+      systemInstruction = t.systemRole;
+      userContent = `${t.userPrompt}\n\nDOCUMENTATION TO CHECK:\n${data.step4Result}`;
       break;
+    }
     default:
       throw new Error(`Invalid step ID: ${stepId}`);
   }
@@ -37,7 +58,10 @@ export const runGeminiStep = async (stepId: number, data: WorkflowData, template
   try {
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
-      contents: prompt,
+      contents: userContent,
+      config: {
+        systemInstruction: systemInstruction
+      }
     });
 
     return response.text || "No response generated.";
