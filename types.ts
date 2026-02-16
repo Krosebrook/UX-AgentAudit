@@ -1,4 +1,16 @@
+
 export type StepStatus = 'pending' | 'loading' | 'completed' | 'error';
+
+export interface GroundingChunk {
+  web?: {
+    uri: string;
+    title: string;
+  };
+  maps?: {
+    uri: string;
+    title: string;
+  };
+}
 
 export interface WorkflowStep {
   id: number;
@@ -8,8 +20,11 @@ export interface WorkflowStep {
   expectedOutput: string;
   exampleSystemRole: string;
   exampleUserPrompt: string;
+  systemRoleExamples: string[];
+  userPromptExamples: string[];
   status: StepStatus;
   content: string;
+  citations?: GroundingChunk[];
 }
 
 export interface WorkflowData {
@@ -32,4 +47,9 @@ export interface PromptTemplates {
   step3: PromptTemplate;
   step4: PromptTemplate;
   step5: PromptTemplate;
+}
+
+export interface StepResult {
+  text: string;
+  citations?: GroundingChunk[];
 }
