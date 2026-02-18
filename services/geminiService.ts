@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 import { WorkflowData, PromptTemplates, StepResult } from '../types';
 
@@ -29,9 +28,9 @@ export const runGeminiStep = async (
   switch (stepId) {
     case 1: {
       const t = getTemplate('step1');
-      // Enhanced instruction for authoritative search grounding
-      systemInstruction = `${t.systemRole}\n\nWhen using Google Search, you MUST prioritize and explicitly favor results from peer-reviewed academic journals (ACM, IEEE, MIS Quarterly) and authoritative industry leaders (Nielsen Norman Group, Baymard Institute, W3C/WAI). Avoid non-expert blogs or forum posts. Cross-reference the audit findings with these high-authority sources to ensure the highest standard of UX justification.`;
-      userContent = `${t.userPrompt}\n\nAUDIT REPORT:\n${data.auditReport}`;
+      // Use the system role defined in the template directly without injecting hardcoded UX constraints
+      systemInstruction = t.systemRole;
+      userContent = `${t.userPrompt}\n\nINPUT CONTEXT / AUDIT REPORT:\n${data.auditReport}`;
       
       // Feature: Use Gemini 3 Flash with Search for grounding analysis
       model = 'gemini-3-flash-preview';
@@ -60,7 +59,7 @@ export const runGeminiStep = async (
     case 4: {
       const t = getTemplate('step4');
       systemInstruction = t.systemRole;
-      userContent = `${t.userPrompt}\n\nUSER STORIES:\n${data.step3Result}`;
+      userContent = `${t.userPrompt}\n\nUSER STORIES / TASKS:\n${data.step3Result}`;
       
       // Feature: Use Thinking mode for drafting complex documentation
       model = 'gemini-3-pro-preview';

@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { 
   Play, 
@@ -55,8 +54,8 @@ import { markdown } from '@codemirror/lang-markdown';
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://esm.sh/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
 
 const SETTINGS_TAB_ID = 99;
-const STORAGE_KEY = 'ux_audit_prompts';
-const THEME_KEY = 'ux_audit_theme';
+const STORAGE_KEY = 'universal_audit_prompts'; // Updated key
+const THEME_KEY = 'universal_audit_theme'; // Updated key
 
 const App: React.FC = () => {
   const [auditReport, setAuditReport] = useState<string>('');
@@ -91,17 +90,10 @@ const App: React.FC = () => {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed.step1 && typeof parsed.step1 === 'string') {
-          const migrated: any = {};
-          (Object.keys(DEFAULT_PROMPT_TEMPLATES) as Array<keyof PromptTemplates>).forEach(key => {
-            migrated[key] = {
-              systemRole: DEFAULT_PROMPT_TEMPLATES[key].systemRole,
-              userPrompt: parsed[key] || DEFAULT_PROMPT_TEMPLATES[key].userPrompt
-            };
-          });
-          return migrated as PromptTemplates;
+        // Simple migration check if structure matches
+        if (parsed.step1 && parsed.step1.systemRole) {
+           return parsed as PromptTemplates;
         }
-        return parsed;
       }
       return DEFAULT_PROMPT_TEMPLATES;
     } catch (e) {
@@ -243,7 +235,7 @@ const App: React.FC = () => {
 
   const runWorkflow = useCallback(async () => {
     if (!auditReport.trim()) {
-      setError("Please provide an audit report before starting the workflow.");
+      setError("Please provide an input document before starting the workflow.");
       return;
     }
     setIsProcessing(true);
@@ -298,8 +290,8 @@ const App: React.FC = () => {
   const getStepIcon = (id: number) => {
     switch (id) {
       case 1: return <ClipboardList className="w-5 h-5" />;
-      case 2: return <UserSquare className="w-5 h-5" />;
-      case 3: return <CheckCircle2 className="w-5 h-5" />;
+      case 2: return <Lightbulb className="w-5 h-5" />;
+      case 3: return <Layers className="w-5 h-5" />;
       case 4: return <BookOpen className="w-5 h-5" />;
       case 5: return <ShieldCheck className="w-5 h-5" />;
       default: return <FileText className="w-5 h-5" />;
@@ -317,7 +309,7 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="bg-indigo-600 p-2 rounded-lg"><FileText className="w-6 h-6 text-white" /></div>
-            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">UX Audit Agent</h1>
+            <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">Workflow Agent</h1>
           </div>
           <div className="flex items-center space-x-4">
             <button onClick={toggleTheme} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition-colors">
@@ -340,7 +332,7 @@ const App: React.FC = () => {
           <div className="lg:col-span-3 space-y-4">
             <nav className="space-y-1">
                <button onClick={() => setActiveTab(0)} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeTab === 0 ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 ring-1 ring-indigo-200 dark:ring-indigo-800 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
-                  <FileText className="w-5 h-5 mr-3" /> Audit Input
+                  <FileText className="w-5 h-5 mr-3" /> Input Context
                 </button>
               {steps.map((step) => (
                 <button key={step.id} onClick={() => { setActiveTab(step.id); setIsEditingResult(false); }} disabled={step.status === 'pending' && !isProcessing} className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeTab === step.id ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 ring-1 ring-indigo-200 dark:ring-indigo-800 shadow-sm' : step.status === 'pending' ? 'text-slate-400 dark:text-slate-600 cursor-not-allowed' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
@@ -357,7 +349,7 @@ const App: React.FC = () => {
             <div className="pt-2">
               <button onClick={() => { setActiveTab(SETTINGS_TAB_ID); setIsEditingResult(false); }} className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all relative ${activeTab === SETTINGS_TAB_ID ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 ring-1 ring-indigo-200 dark:ring-indigo-800 shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
                 <Settings className="w-5 h-5 mr-3" /> 
-                <span>Prompt Settings</span>
+                <span>Agent Settings</span>
                 {validationIssues.length > 0 && showValidationErrors && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -405,7 +397,7 @@ const App: React.FC = () => {
                 <div className="flex-1 flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
-                      {activeTab === 0 ? "Input Audit Report" : activeTab === SETTINGS_TAB_ID ? "Prompt Configuration" : steps.find(s => s.id === activeTab)?.title}
+                      {activeTab === 0 ? "Input Context" : activeTab === SETTINGS_TAB_ID ? "Prompt Configuration" : steps.find(s => s.id === activeTab)?.title}
                     </h2>
                     {isProcessing && activeTab > 0 && activeTab < SETTINGS_TAB_ID && steps.find(s => s.id === activeTab)?.status === 'loading' && (
                       <span className="flex items-center space-x-1.5 px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-[10px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wider animate-pulse border border-indigo-200 dark:border-indigo-800/50">
@@ -449,19 +441,19 @@ const App: React.FC = () => {
                 {activeTab === 0 && (
                   <div className="space-y-4 h-full flex flex-col animate-in fade-in zoom-in-95 duration-200">
                     <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-400 p-4">
-                      <p className="text-sm text-amber-700 dark:text-amber-200">Paste your UX Audit text or upload a file (.txt, .pdf). Content is required to begin the workflow.</p>
+                      <p className="text-sm text-amber-700 dark:text-amber-200">Paste your Audit Report, Code Snippet, Legal Contract, or any text to analyze. Content is required to begin the workflow.</p>
                     </div>
                     <label className={`flex items-center justify-between p-4 border border-dashed rounded-lg cursor-pointer transition-all ${isReadingFile ? 'bg-indigo-50 dark:bg-indigo-900/10 border-indigo-300' : 'bg-slate-50 dark:bg-slate-800/30 border-slate-300 dark:border-slate-700 hover:border-indigo-400'}`}>
                       <div className="flex items-center space-x-3 text-slate-700 dark:text-slate-300">
                         <Upload className={`w-5 h-5 ${isReadingFile ? 'animate-bounce text-indigo-600' : ''}`} />
-                        <div><p className="text-sm font-medium">Upload Audit File</p><p className="text-xs opacity-60">PDF or Text</p></div>
+                        <div><p className="text-sm font-medium">Upload File</p><p className="text-xs opacity-60">PDF or Text</p></div>
                       </div>
                       <input type="file" className="sr-only" accept=".txt,.pdf" onChange={handleFileUpload} disabled={isReadingFile} />
                     </label>
                     <textarea 
                       value={auditReport} 
                       onChange={(e) => setAuditReport(e.target.value)} 
-                      placeholder="Paste your UX Audit Report text here..." 
+                      placeholder="Paste your content here..." 
                       className={`flex-1 w-full p-4 border rounded-lg font-mono text-sm leading-relaxed resize-none bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-all focus:ring-2 focus:ring-indigo-500 ${!auditReport.trim() ? 'border-amber-200 dark:border-amber-800/50' : 'border-slate-200 dark:border-slate-800'}`} 
                     />
                     
@@ -471,7 +463,7 @@ const App: React.FC = () => {
                         {!auditReport.trim() ? (
                           <div className="flex items-center text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-full border border-amber-100 dark:border-amber-800/50 animate-pulse">
                             <AlertCircle className="w-3.5 h-3.5 mr-1.5" />
-                            <span>Input is empty. Add report content to proceed.</span>
+                            <span>Input is empty. Add content to proceed.</span>
                           </div>
                         ) : (
                           <div className="flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1.5 rounded-full border border-emerald-100 dark:border-emerald-800/50">
@@ -591,7 +583,7 @@ const App: React.FC = () => {
                             <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-1 uppercase tracking-tight">Context Chain</h4>
                             <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
                               {selectedSettingStep === 1 
-                                ? 'This step acts as the entry point, processing the original uploaded audit document directly.' 
+                                ? 'This step acts as the entry point, processing the original uploaded document directly.' 
                                 : `This step receives the detailed output from Step ${selectedSettingStep - 1} as its primary instruction context.`}
                             </p>
                           </div>
@@ -614,7 +606,7 @@ const App: React.FC = () => {
                               onChange={(e) => handlePromptChange(currentPromptKey, 'systemRole', e.target.value)} 
                               rows={3} 
                               className={`w-full p-4 border rounded-xl text-sm leading-relaxed bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 transition-all resize-none shadow-inner ${showValidationErrors && !prompts[currentPromptKey].systemRole.trim() ? 'border-red-500 ring-1 ring-red-500 bg-red-50/10 dark:bg-red-900/5' : 'border-slate-200 dark:border-slate-800'}`} 
-                              placeholder="e.g. You are a Senior UX Researcher..."
+                              placeholder="e.g. You are a Senior Researcher..."
                             />
                             
                             {/* Descriptive explanation for Role */}
